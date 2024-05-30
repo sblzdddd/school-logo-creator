@@ -43,3 +43,8 @@ const drawCirclePath = (cx: number, cy: number, r: number): string => {
         this.pathAlign = 'center';
     }
 };
+
+// Extend fabric.IText prototype to add setCurvedTextPosition method
+(fabric.IText.prototype as any).getLength = function (): void {
+    console.log(this.stateProperties)
+};

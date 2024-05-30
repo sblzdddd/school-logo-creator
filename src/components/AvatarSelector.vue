@@ -11,9 +11,9 @@
             :style="`background-image: url(/avatar/${avatar}_00.png);`" />
         </div>
         <div class="variant_selector">
-            <transition-group name="fade">
+            <transition-group name="fade" @after-leave="afterLeave">
                 <div v-for="(variant, index) in variants_list" :key="index" @click="completeSelection(variant)"
-                :style="`background-image: url(/avatar/${variant});`" />
+                :style="`background-image: url(/avatar/${variant}); --index: ${index}`" />
             </transition-group>
         </div>
       </div>
@@ -27,6 +27,9 @@ const avatar_list = ref<string[]>([])
 const variants_list = ref<string[]>([])
 const selector = ref<HTMLDialogElement>()
 const selected = ref<string>()
+
+let newVariants: string[] = [];
+let leaveLength = 0;
 
 interface Metadata {
   [key: string]: string[];
@@ -49,11 +52,19 @@ onMounted(() => {
 });
 
 function showVariants(avatar:string) {
-    console.log(`Avatar Id=${avatar}`)
+  console.log(`Avatar Id=${avatar}`)
+  let v: string[] = []
+  for (const element of metadata[avatar]) {
+    v.push(`${avatar}_${element}.png`)
+  }
+  leaveLength = variants_list.value.length;
+  if(newVariants.length == 0) {
+    variants_list.value = v
+    newVariants = v
+  } else {
+    newVariants = v
     variants_list.value = []
-    for (const element of metadata[avatar]) {
-        variants_list.value.push(`${avatar}_${element}.png`)
-    }
+  }
 }
 function completeSelection(variant:string) {
     selector.value?.close();
@@ -62,11 +73,18 @@ function completeSelection(variant:string) {
     emit('update', selected.value);
 }
 const emit = defineEmits(['update']);
+
+const afterLeave = () => {
+  leaveLength--;
+  if(leaveLength <= 0) {
+    variants_list.value = newVariants;
+  }
+}
 </script>
 <style scoped>
 .modal-box {
-    @apply flex flex-col sm:w-[80vw] w-screen;
-    max-width: 1280px;
+  @apply flex flex-col sm:w-[80vw] w-screen;
+  max-width: 1280px;
 }
 .selector_root {
     @apply w-full h-20 flex-grow flex gap-2;
@@ -76,28 +94,38 @@ const emit = defineEmits(['update']);
     @apply xl:w-[370px] lg:w-[270px] w-[150px] flex flex-wrap overflow-x-visible overflow-y-auto p-2 px-0;
 }
 .avatar_selector div {
-    @apply w-24 h-24 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg
-    hover:scale-[1.1] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1.05];
-    background-size: 170%;
-    background-position: center top;
-    box-shadow: 0 0 8px 0px #00000024;
-    transition: all 250ms ease;
+  @apply w-24 h-24 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg shadow-md hover:shadow-lg
+  hover:scale-[1.1] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1.05];
+  transform-origin: bottom;
+  background-size: 170%;
+  background-position: center top;
+  transition: all 250ms ease;
 }
 .variant_selector {
     @apply h-auto flex-grow flex flex-col flex-wrap content-start justify-start
     overflow-x-visible overflow-y-auto p-4 pl-0;
 }
 .variant_selector div {
-    @apply w-40 h-52 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg
-    hover:scale-[1.02] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1];
-    background-size: 170%;
-    background-position: center top;
-    box-shadow: 0 0 8px 0px #00000024;
-    transition: all 250ms ease;
+  @apply w-40 h-52 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg shadow-md hover:shadow-xl
+  hover:scale-[1.02] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1];
+  transform-origin: bottom;
+  background-size: 170%;
+  background-position: center top;
+  transition: all 250ms ease;
+}
+:root {
+  --index: 1;
 }
 /* Define the transition effects */
 .fade-move, .fade-enter-active, .fade-leave-active {
-  transition: all 250ms ease;
+  transition: all 200ms ease !important;
+}
+.fade-enter-active {
+  transition-delay: calc(var(--index) * 0.02s)!important;
+}
+.fade-leave-active {
+  transition: all 100ms ease !important;
+  transition-delay: calc(var(--index) * -0.01s)!important;
 }
 
 .fade-enter-from, .fade-leave-to {
