@@ -9,9 +9,9 @@ const props = defineProps({
 </script>
 
 <template>
-<div class="collapse collapse-arrow bg-blue-200 shadow-md">
+<div class="collapse collapse-arrow bg-base-200 shadow-md">
   <input type="checkbox" checked />
-  <div class="collapse-title">{{ props.title }}</div>
+  <div class="collapse-title"><slot name="header"></slot>{{ props.title }}</div>
   <div class="collapse-content">
     <slot></slot>
   </div>

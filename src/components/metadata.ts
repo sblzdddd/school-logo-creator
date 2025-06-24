@@ -1,4 +1,3 @@
-
-const VERSION:string = "1.2"
+const VERSION:string = "1.3"
 
 export {VERSION}

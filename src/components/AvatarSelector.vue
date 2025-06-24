@@ -94,9 +94,8 @@ const afterLeave = () => {
     @apply xl:w-[370px] lg:w-[270px] w-[150px] flex flex-wrap overflow-x-visible overflow-y-auto p-2 px-0;
 }
 .avatar_selector div {
-  @apply w-24 h-24 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg shadow-md hover:shadow-lg
+  @apply w-24 h-24 bg-no-repeat mb-4 ml-4 border-2 border-white/20 rounded-lg shadow-md hover:shadow-lg
   hover:scale-[1.1] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1.05];
-  transform-origin: bottom;
   background-size: 170%;
   background-position: center top;
   transition: all 250ms ease;
@@ -106,7 +105,7 @@ const afterLeave = () => {
     overflow-x-visible overflow-y-auto p-4 pl-0;
 }
 .variant_selector div {
-  @apply w-40 h-52 bg-no-repeat mb-4 ml-4 border-[8px] border-white rounded-lg shadow-md hover:shadow-xl
+  @apply w-40 h-52 bg-no-repeat mb-4 ml-4 border-2 border-white/20 rounded-lg shadow-md hover:shadow-xl
   hover:scale-[1.02] hover:opacity-[0.6] cursor-pointer active:opacity-[0.3] active:scale-[1];
   transform-origin: bottom;
   background-size: 170%;

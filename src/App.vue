@@ -1,29 +1,23 @@
 <template>
-  <h1 class="title">SCIE LOGO CREATOR</h1>
-  <p class="text-lg">Version {{ VERSION }} by sblzdddd, hosted on
-    <a target="_blank" href="https://pages.cloudflare.com/" class="link link-primary">Cloudflare Pages</a></p>
-
+  <h1 class="title">SCIE LOGO CREATOR <div class="badge badge-primary absolute top-[-10px] right-[-40px]">{{ VERSION }}</div></h1>
   <div role="alert" class="alert alert-info mt-4">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    <span>Click on the image to do transformations.</span>
-  </div>
-  <div role="alert" class="alert alert-warning">
-    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-    <span>exporting svg format is a highly experimental feature, and not supported in any custom mode.</span>
+    <span>Click on the image to move and resize.<br> Custom texts are still not supported in SVG format.</span>
   </div>
 
   <div class="content">
     <div class="flex flex-col flex-wrap gap-3 justify-start items-start">
-      <LogoCanvas :show_continents="showContinents!" :image_url="imageUrl" :modify_texts="modifyTexts"
+      <LogoCanvas :continents_opacity="continentsOpacity" :image_url="imageUrl" :modify_texts="modifyTexts"
                   ref="canvasRef" :top_text="topText" :bottom_text="bottomText" :year_text="yearText" :resolution="resolution" />
     </div>
 
     <div class="control">
       <collapse title="Avatar Image">
         <div class="form-control">
-          <label class="label cursor-pointer">
-            <span class="label-text">Show continents background</span>
-            <input type="checkbox" v-model="showContinents" class="checkbox checkbox-primary" checked />
+          <label class="label w-full">
+            <span class="label-text mr-2">Continents opacity</span>
+            <input type="range" v-model="continentsOpacity" min="0" max="100" class="range range-primary" />
+            <span class="label-text-alt w-16 text-right">{{ continentsOpacity }}%</span>
           </label>
         </div>
         <div class="join">
@@ -47,42 +41,41 @@
         </div>
       </collapse>
 
-      <collapse title="Texts">
-        <div class="form-control">
-          <label class="label cursor-pointer">
-            <span class="label-text">Custom Texts</span>
-            <input type="checkbox" v-model="modifyTexts" class="checkbox checkbox-primary" />
+      <collapse title="Custom Texts">
+        <template #header>
+          <input type="checkbox" v-model="modifyTexts" class="checkbox checkbox-primary mr-4 z-10" @click.stop />
+        </template>
+
+        <template v-if="modifyTexts">
+          <label class="form-control w-full">
+            <div class="label w-full mb-2">
+              <span class="label-text text-left">Top English Text</span>
+            </div>
+            <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
+                  v-model="topText"/>
           </label>
-        </div>
 
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Top English Text</span>
-          </div>
-          <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
-                 v-model="topText"/>
-        </label>
+          <label class="form-control w-full">
+            <div class="label w-full mb-2">
+              <span class="label-text text-left">Bottom Chinese Text</span>
+            </div>
+            <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
+                  v-model="bottomText"/>
+          </label>
 
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Bottom Chinese Text</span>
-          </div>
-          <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
-                 v-model="bottomText"/>
-        </label>
-
-        <label class="form-control w-full">
-          <div class="label">
-            <span class="label-text">Year Text</span>
-          </div>
-          <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
-                 v-model="yearText"/>
-        </label>
+          <label class="form-control w-full">
+            <div class="label w-full mb-2">
+              <span class="label-text">Year Text</span>
+            </div>
+            <input type="text" placeholder="Type here" class="input input-bordered input-primary w-full"
+                  v-model="yearText"/>
+          </label>
+        </template>
       </collapse>
 
-      <collapse title="Export">
+      <div class="p-4 bg-base-200 rounded-lg shadow-md w-full flex flex-col gap-2">
+        <h1 class="text-2xl font-bold">Export</h1>
         <div class="flex justify-center items-center gap-2">
-
           <select class="select select-bordered select-primary flex-grow" v-model="downloadFormat">
             <option disabled>Select format</option>
             <option :selected="!modifyTexts">png</option>
@@ -97,11 +90,16 @@
             <option>960x</option>
             <option>1024x</option>
             <option>1200x</option>
+            <option>1440x</option>
+            <option>1920x</option>
+            <option>2560x</option>
+            <option>3840x</option>
+            <option>4096x</option>
           </select>
         </div>
         <button class="grow btn btn-primary btn-outline"
-                @click="canvasRef.download(downloadFormat)">Download</button>
-      </collapse>
+              @click="canvasRef.download(downloadFormat)">Download</button>
+      </div>
     </div>
 
   </div>
@@ -114,7 +112,7 @@ import {ref, watch} from 'vue';
 import LogoCanvas from './components/LogoCanvas.vue'
 import AvatarSelector from './components/AvatarSelector.vue'
 import Collapse from './components/Collapse.vue'
-const showContinents = ref<boolean>()
+const continentsOpacity = ref<number>(100)
 const modifyTexts = ref<boolean>(false)
 const imageType = ref<string>("");
 const downloadFormat = ref<string>("png");
@@ -130,7 +128,6 @@ yearText.value = "2003"
 
 const imageUrl = ref<string>("");
 const canvasRef = ref();
-showContinents.value = true;
 imageType.value = "None";
 
 watch(() => imageType.value, () => {
@@ -164,7 +161,7 @@ function onFileChange(event: Event) {
 
 <style scoped>
 .title {
-  @apply text-primary lg:text-6xl text-4xl font-bold;
+  @apply text-info lg:text-6xl text-4xl font-bold;
   filter: drop-shadow(3px 3px 5px rgba(50, 173, 255, 0.218))
 }
 .content {

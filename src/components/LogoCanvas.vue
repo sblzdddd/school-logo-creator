@@ -1,4 +1,3 @@
-
 <template>
   <canvas ref="lc" id="logo_canvas" width="512" height="512"></canvas>
   <a class="downloader hidden" ref="downloader"></a>
@@ -33,9 +32,9 @@ fabric.Object.prototype.cornerColor = "#45aeee"
 
 
 const props = defineProps({
-  show_continents: {
-    type: Boolean,
-    default: true,
+  continents_opacity: {
+    type: Number,
+    default: 100,
     required: true
   },
   image_url: {
@@ -136,13 +135,12 @@ onMounted(() => {
       height: 27.17,
       originX: 'center',
       originY: 'center',
-      selectable: false
+      selectable: false,
+      opacity: props.continents_opacity / 100
     });
     continents_svg.scaleToWidth(size / 100 * 45.86, true);
     change_svg_color(continents_svg, primary_col.value)
-    if (props.show_continents) {
-      canvas.add(continents_svg);
-    }
+    canvas.add(continents_svg);
   });
   fabric.loadSVGFromURL(text_svg_url, function(objects,options) {
     text_svg = fabric.util.groupSVGElements(objects, options);
@@ -290,12 +288,10 @@ onMounted(() => {
   watch(() => props.bottom_text, updateTexts);
   watch(() => props.year_text, updateTexts);
 
-  watch(() => props.show_continents, () => {
-    if (props.show_continents) {
-      canvas.add(continents_svg);
-      canvas.sendToBack(continents_svg);
-    } else {
-      canvas.remove(continents_svg)
+  watch(() => props.continents_opacity, () => {
+    if (continents_svg) {
+      continents_svg.set('opacity', props.continents_opacity / 100);
+      canvas.renderAll();
     }
   });
   watch(() => props.modify_texts, () => {
